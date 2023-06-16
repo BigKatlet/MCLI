@@ -6,9 +6,10 @@ namespace MCLI
 {
     public static class interpreter
     {
-        static string _storageStrPath;
-        static string _storageIntPath;
 
+        //Variables. Coming soon.
+        /*static string _storageStrPath;
+        static string _storageIntPath;*/
 
         public static void executeProgramm(string path, string name){
             if (!name.EndsWith(".exe"))
@@ -19,6 +20,7 @@ namespace MCLI
             {
                 string fullPath = path + name;
 
+                //Yep, that's too variables. They're too coming soon.
                 /*_storageStrPath = fullPath.Remove(_storageStrPath.Length-4, 4);
                 _storageStrPath += "_str.tmp";
                 File.Create(_storageStrPath);
@@ -28,6 +30,7 @@ namespace MCLI
                 _storageIntPath += "_int.tmp";
                 File.Create(_storageIntPath);*/
 
+                //Read all lines from file and execute all of them.
                 string[] lines = File.ReadAllLines(fullPath);
                 foreach (string line in lines)
                 {
@@ -39,6 +42,8 @@ namespace MCLI
 
         public static void editFile(string path, string name)
         {
+            //Opens .exe editor.
+            //TODO: write mew file editor.
             string fullPath = path + name;
             int counter = 0;
 

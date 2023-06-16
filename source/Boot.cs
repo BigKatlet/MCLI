@@ -13,12 +13,10 @@ namespace MCLI
         public static void afterBoot()
         {
             FS.initializeFs();
-            FS.curPath = FS.stdPath;
             Cosmos.System.PCSpeaker.Beep(2000, 25);
-            Console.SetCursorPosition(0, 2);
-            Cosmos.System.KeyboardManager.ScrollLock = false;
             api.cls();
 
+            //Creates system files
             if (!Directory.Exists(@"0:\System"))
             {
                 Installer.firstStartup();

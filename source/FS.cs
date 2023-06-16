@@ -10,13 +10,16 @@ namespace MCLI
 {
     public static class FS
     {
-        public static string stdPath = @"0:\User\";
+        //After-boot directory.
+        private static string stdPath = @"0:\User\";
+        //Current directory.
         public static string curPath;
 
-        public static CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
+        public static CosmosVFS fs = new CosmosVFS();
         public static void initializeFs()
         {
             Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
+            FS.curPath = FS.stdPath;
         }
     }
 }

@@ -14,14 +14,10 @@ namespace MCLI
         }
         protected override void Run()
         {
-            int curPosX = Console.GetCursorPosition().Left;
-            int curPosY = Console.GetCursorPosition().Top;
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write(FS.curPath + ">");
             Console.ForegroundColor = ConsoleColor.White;
-            string input = Console.ReadLine();
-            string[] arg = input.Split(' ', StringSplitOptions.TrimEntries);
-            terminal.execute(arg);
+            terminal.execute(Console.ReadLine().Split(' ', StringSplitOptions.TrimEntries));
         }
     }
 }

@@ -11,43 +11,24 @@ namespace MCLI
 {
     public static class terminal
     {
-
-        const int buildVer = 110;
+        //Build version
+        const int buildVer = 116;
+        //Stable version
         const int stableVer = 1;
-
-        static string uniteArgs(string[] arg, int val)
-        {
-            for (int x = 0; x != val; x++)
-            {
-                arg[x] = "";
-            }
-            return string.Concat(arg);
-        }
-
-        static string uniteArgs(string[] arg, int val, bool addSpace)
-        {
-            for (int x = 0; x != arg.Length; x++)
-            {
-                arg[x] += " ";
-            }
-            for (int x = 0; x != val; x++)
-            {
-                arg[x] = "";
-            }
-            return string.Concat(arg);
-        }
 
         public static void execute(string[] arg)
         {
             switch (arg[0])
             {
                 case "info":
+                    //Info about system
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("MCLI (Main Command Line Interface Operating System)");
                     Console.WriteLine("Build #" + buildVer + "/15.06.2023");
                     Console.WriteLine("Stable version #" + stableVer);
                     Console.Write("--------------------------------------------------------------------------------");
                     Console.ForegroundColor = ConsoleColor.White;
+                    //Easter egg
                     if (arg.Length > 1)
                     {
                         if (arg[1] == "2")
@@ -63,16 +44,9 @@ namespace MCLI
                                 Cosmos.HAL.Global.PIT.Wait(Convert.ToUInt32(times[i]));
                             }
                         }
-                        else if (arg[1] == "3")
-                        {
-                            for(int x = 0; x != 255; x++)
-                            {
-                                Console.Write((char)x);
-                            }
-                        }
                     }
                     break;
-                case "readStr":
+                case "readFile":
                     string[] text = File.ReadAllLines(FS.curPath + arg[1]);
                     foreach(string x in text)
                     {
@@ -80,128 +54,77 @@ namespace MCLI
                     }
                     break;
                 case "setStr":
+                    //DON'T TOUCH THIS SHIT. IT MAY NOT WORK.
                     string name = arg[1];
                     string textToWrite = uniteArgs(arg, 2, true);
                     api.setStr(FS.curPath, name, textToWrite);
                     break;
                 case "crtFile":
+                    //Creates file
                     api.crtFile(FS.curPath, arg[1]);
                     break;
                 case "delFile":
+                    //Deletes file
                     api.delFile(FS.curPath, arg[1]);
                     break;
                 case "crtDir":
+                    //Creates directory
                     api.crtDir(FS.curPath, arg[1]);
                     break;
                 case "delDir":
+                    //Deletes directory
                     api.delDir(FS.curPath, arg[1]);
                     break;
                 case "cd":
-                    string path = ""; path = FS.curPath + arg[1] + @"\";
-                    if (Directory.Exists(path))
-                    {
-                        FS.curPath = path;
-                    }
-                    else
-                    {
-                        api.notification(2, "Directory '" + path + "' doesn't exist!");
-                    }
+                    //cd from windows
+                    changeDir(arg[1]);
                     break;
                 case "cls":
                     api.cls();
                     break;
                 case "dir":
-                    string[] dirs = Directory.GetDirectories(FS.curPath);
-                    int totalLen = 25;
-                    int count = 0;
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("--------------------------------------------------------------------------------");
-                    foreach (string dir in dirs)
-                    {
-                        if(count == 0) { Console.ForegroundColor = ConsoleColor.White; } 
-                        else { Console.ForegroundColor = ConsoleColor.Gray;}
-                        count++; if (count > 1) { count = 0; }
-
-                        Console.Write(dir);
-                        for(int x = 0; x != totalLen - dir.Length; x++)
-                        {
-                            Console.Write(" ");
-                        }
-                        Console.Write("<dir>");
-
-                        string[] dirsInDir = Directory.GetDirectories(FS.curPath + dir);
-                        string[] filesInDir = Directory.GetFiles(FS.curPath + dir);
-
-                        if (dirsInDir.Length < 1 && filesInDir.Length < 1)
-                        {
-                            Console.WriteLine("   (empty)");
-                        }
-                        else
-                        {
-                            Console.Write("\n");
-                        }
-                    }
-                    string[] files = Directory.GetFiles(FS.curPath);
-                    foreach (string file in files)
-                    {
-                        if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
-                        else { Console.ForegroundColor = ConsoleColor.Gray; }
-                        count++; if (count > 1) { count = 0; }
-
-                        Console.Write(file);
-                        int size = (int)new FileInfo(FS.curPath + file).Length;
-                        for (int x = 0; x != totalLen - file.Length; x++)
-                        {
-                            Console.Write(" ");
-                        }
-                        Console.Write(size.ToString());
-                        Console.WriteLine("B");
-                    }
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("--------------------------------------------------------------------------------");
+                    dir();
                     break;
                 case "exe":
+                    //Executes .exe file
                     interpreter.executeProgramm(FS.curPath, arg[1]);
                     break;
                 case "editExe":
+                    //Opens .exe editor
                     interpreter.editFile(FS.curPath, arg[1]);
                     break;
                 case "say":
-                    string textToSay = uniteArgs(arg, 1, true);
-                    api.say(textToSay);
+                    //Writes text to console.
+                    api.say(uniteArgs(arg, 1, true));
                     break;
                 case "shutdown":
+                    //SUDDENLY, shuts off system.
                     Cosmos.System.Power.Shutdown();
                     break;
                 case "root":
+                    //Go to root
                     FS.curPath = @"0:\";
                     break;
                 case "up":
-                    if(FS.curPath != @"0:\")
-                    {
-                        string[] pieces = FS.curPath.Split(@"\");
-                        string newPath = "";
-                        for (int x = 0; x != pieces.Length - 2; x++)
-                        {
-                            newPath += pieces[x] + @"\";
-                        }
-                        FS.curPath = newPath;
-                    }
-                    else
-                    {
-                        api.notification(1, "Can't go upper than root folder!");
-                    }
+                    //Go upper
+                    FS.curPath = up();
                     break;
                 case "chngCol":
+                    //SUDDENLY, changes color of output. 
+                    // 0 - white; 1 - gray; 2 - yellow; 3 - red; 4 - dark blue;
+                    // 5 - blue; 6 - dark green; 7 - green; 8 - pink; 9 - cyan.
                     api.chngCol(Convert.ToChar(arg[1]));
                     break;
                 case "commander":
+                    //Commander parody
                     api.commander();
                     break;
                 case "help":
+                    //Execute through interpreter "0:\System\Apps\Help.exe".
                     interpreter.executeProgramm(@"0:\System\Apps\", "Help.exe");
                     break;
                 case "waitForKey":
+                    //Wait for key press and erase symbol.
                     Console.ReadKey();
                     Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
                     Console.Write(" ");
@@ -211,6 +134,122 @@ namespace MCLI
                     api.notification(2, "Unknown command. Use /help");
                     break;
             }
+        }
+
+        static string up()
+        {
+            if (FS.curPath != @"0:\")
+            {
+                //Holy fucking magic with strings
+                string[] pieces = FS.curPath.Split(@"\");
+                string newPath = "";
+                for (int x = 0; x != pieces.Length - 2; x++)
+                {
+                    newPath += pieces[x] + @"\";
+                }
+                return newPath;
+            }
+            else
+            {
+                api.notification(1, "Can't go upper than root folder!");
+                return @"0:\";
+            }
+        }
+
+        static void dir()
+        {
+            //Displays content of directory
+            string[] dirs = Directory.GetDirectories(FS.curPath);
+            int totalLen = 25;
+            int count = 0;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("--------------------------------------------------------------------------------");
+            foreach (string dir in dirs)
+            {
+                if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
+                else { Console.ForegroundColor = ConsoleColor.Gray; }
+                count++; if (count > 1) { count = 0; }
+
+                Console.Write(dir);
+                for (int x = 0; x != totalLen - dir.Length; x++)
+                {
+                    Console.Write(" ");
+                }
+                Console.Write("<dir>");
+
+                string[] dirsInDir = Directory.GetDirectories(FS.curPath + dir);
+                string[] filesInDir = Directory.GetFiles(FS.curPath + dir);
+
+                if (dirsInDir.Length < 1 && filesInDir.Length < 1)
+                {
+                    Console.WriteLine("   (empty)");
+                }
+                else
+                {
+                    Console.Write("\n");
+                }
+            }
+            string[] files = Directory.GetFiles(FS.curPath);
+            foreach (string file in files)
+            {
+                if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
+                else { Console.ForegroundColor = ConsoleColor.Gray; }
+                count++; if (count > 1) { count = 0; }
+
+                Console.Write(file);
+                int size = (int)new FileInfo(FS.curPath + file).Length;
+                for (int x = 0; x != totalLen - file.Length; x++)
+                {
+                    Console.Write(" ");
+                }
+                Console.Write(size.ToString());
+                Console.WriteLine("B");
+            }
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("--------------------------------------------------------------------------------");
+        }
+
+        private static void changeDir(string dirName)
+        {
+            if (!String.IsNullOrEmpty(dirName))
+            {
+                string path = FS.curPath + dirName;
+                if (Directory.Exists(path))
+                {
+                    FS.curPath = path + @"\";
+                }
+                else
+                {
+                    api.notification(2, "Directory '" + path + "' doesn't exist!");
+                }
+            }
+        }
+
+        static string uniteArgs(string[] arg, int argsToRemove)
+        {
+            //Deletes [argsToRempove] args and unites remaining strings to one.
+            //Delete some args
+            for (int x = 0; x != argsToRemove; x++)
+            {
+                arg[x] = "";
+            }
+            return string.Concat(arg);
+        }
+
+        static string uniteArgs(string[] arg, int argsToRemove, bool addSpace)
+        {
+            //Deletes [argsToRempove] args and unites remaining strings to one. Also adds " " to every remaining string.
+            //Add " " to every arg
+            for (int x = 0; x != arg.Length; x++)
+            {
+                arg[x] += " ";
+            }
+            //Delete some args
+            for (int x = 0; x != argsToRemove; x++)
+            {
+                arg[x] = "";
+            }
+            return string.Concat(arg);
         }
     }
 }

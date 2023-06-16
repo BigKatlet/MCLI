@@ -10,9 +10,9 @@ namespace MCLI
     public static class api
     {
 
+        //Parody on DOS commanders
         public static void commander()
         {
-
             for(; ; )
             {
                 api.cls();
@@ -98,7 +98,7 @@ namespace MCLI
             }
         }
 
-        public static string readStr(string path, string name)
+        public static string readTxt(string path, string name)
         {
             string fullPath = path + name;
             if (File.Exists(fullPath))
@@ -168,6 +168,9 @@ namespace MCLI
 
         public static void chngCol(char color)
         {
+            //SUDDENLY, changes color of output. 
+            // 0 - white; 1 - gray; 2 - yellow; 3 - red; 4 - dark blue;
+            // 5 - blue; 6 - dark green; 7 - green; 8 - pink; 9 - cyan.
             switch (color) {
                 case '0':
                     Console.ForegroundColor = ConsoleColor.White;
@@ -207,30 +210,6 @@ namespace MCLI
             Console.Clear();
         }
 
-        public static void tryToDelFile(string path)
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-            else
-            {
-                api.notification(1, path + " can't be found");
-            }
-        }
-
-        public static void tryToDelDir(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                Directory.Delete(path);
-            }
-            else
-            {
-                api.notification(1, path + " can't be found");
-            }
-        }
-
         public static void say(string text)
         {
             Console.WriteLine(text);
@@ -238,6 +217,8 @@ namespace MCLI
 
         public static void notification(int type, string msg)
         {
+            //Types: 0 - INFO (gray); 1 - WARN (yellow); 2 - ERR (red).
+            //Write logs if file "0:\System\Logs\doNotif" exists
             if (File.Exists(@"0:\System\Logs\doNotif"))
             {
                 Logger log = new Logger(@"0:\System\Logs\notifications.log");
@@ -258,6 +239,7 @@ namespace MCLI
                 }
                 log.writeLine(msg);
             }
+            //Writes notification to console.
             switch (type)
             {
                 case 0:

@@ -10,6 +10,8 @@ namespace MCLI
     public class Logger
     {
 
+        //Logger [name] = new Logger([string with path to log file, use "0:\System\Logs"])
+
         public string pathToLogFile;
 
         public Logger(string path)
@@ -17,6 +19,7 @@ namespace MCLI
             pathToLogFile = path;
         }
 
+        //It's like Console.Write(), but writes to log file.
         public void write(string text)
         {
             if(pathToLogFile != null)
@@ -31,6 +34,7 @@ namespace MCLI
             }
         }
 
+        //It's like Console.WriteLine(), but writes to log file.
         public void writeLine(string text)
         {
             if (pathToLogFile != null)
