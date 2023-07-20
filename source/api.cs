@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace MCLI
@@ -10,77 +7,287 @@ namespace MCLI
     public static class api
     {
 
-        //Parody on DOS commanders
+        public static bool commanderOpened;
+
         public static void commander()
         {
-            for(; ; )
+            commanderOpened = true;
+            int curPos = 4;
+            api.cls(ConsoleColor.DarkBlue);
+
+            for (; ; )
             {
-                api.cls();
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("-------------------------------");
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("MCLI commander 0.1");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("-------------------------------");
-                Console.WriteLine((FS.fs.GetTotalFreeSpace(@"0:\")/1024).ToString() + "KB of " + (FS.fs.GetTotalSize(@"0:\")/1024).ToString() + "KB available");
-
-                string[] dirs = Directory.GetDirectories(FS.curPath);
-                int totalLen = 25;
-                int count = 0;
-                Console.Write("--------------------------------------------------------------------------------");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(FS.curPath);
-                foreach (string dir in dirs)
+                //💀
+                if (commanderOpened == true)
                 {
-                    if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
-                    else { Console.ForegroundColor = ConsoleColor.Gray; }
-                    count++; if (count > 1) { count = 0; }
-
-                    Console.Write(dir);
-                    for (int x = 0; x != totalLen - dir.Length; x++)
+                    //Clear screen
+                    for(int x = 0; x != 25; x++)
                     {
-                        Console.Write(" ");
+                        Console.SetCursorPosition(1, x);
+                        Console.Write("                                                                               ");
                     }
-                    Console.Write("<dir>   ");
 
-                    string[] dirsInDir = Directory.GetDirectories(FS.curPath + dir);
-                    string[] filesInDir = Directory.GetFiles(FS.curPath + dir);
 
-                    if(dirsInDir.Length < 1 && filesInDir.Length < 1)
+                    ///DRAW GRAPHICS
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(0, 1);
+                    for (int x = 1; x != 23; x++)
                     {
-                        Console.WriteLine("(empty)");
+                        Console.SetCursorPosition(0, x);
+                        Console.Write("|");
                     }
-                    else
-                    {
-                        Console.Write("\n");
-                    }
-                }
-                string[] files = Directory.GetFiles(FS.curPath);
-                foreach (string file in files)
-                {
-                    if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
-                    else { Console.ForegroundColor = ConsoleColor.Gray; }
-                    count++; if (count > 1) { count = 0; }
 
-                    Console.Write(file);
-                    int size = (int)new FileInfo(FS.curPath + file).Length;
-                    for (int x = 0; x != totalLen - file.Length; x++)
+                    for (int x = 1; x != 23; x++)
                     {
-                        Console.Write(" ");
+                        Console.SetCursorPosition(79, x);
+                        Console.Write("|");
                     }
-                    Console.Write(size.ToString());
-                    Console.WriteLine("B");
-                }
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("--------------------------------------------------------------------------------");
-                string[] arg = Console.ReadLine().Split(' ', StringSplitOptions.TrimEntries);
-                if (arg[0] == "" || arg[0] == null)
-                {
-                    break;
+
+                    Console.SetCursorPosition(0, 0);
+                    Console.Write("-------------------------------");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("MCLI commander 0.2");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("-------------------------------");
+
+                    Console.SetCursorPosition(1, 2);
+                    Console.Write("------------------------------------------------------------------------------");
+
+                    Console.SetCursorPosition(0, 23);
+                    Console.Write("--------------------------------------------------------------------------------");
+
+                    Console.SetCursorPosition(1, 1);
+                    Console.Write((FS.fs.GetTotalFreeSpace(@"0:\") / 1024).ToString() + "KB of " + (FS.fs.GetTotalSize(@"0:\") / 1024).ToString() + "KB available");
+                    Console.SetCursorPosition(1, 3);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(FS.curPath);
+                    Console.ForegroundColor  = ConsoleColor.White;
+
+
+                    ///FUCKING MAGICK BEGINS
+                    Console.SetCursorPosition(1, 4);
+                    Console.WriteLine();
+
+                    //Get dirs
+                    string[] dirs = Directory.GetDirectories(FS.curPath);
+                    
+                    int totalLen = 25;
+                    
+                    bool isWhite = true;
+
+                    //Write dirs
+                    foreach (string dir in dirs)
+                    {
+                        if (isWhite == true) 
+                        {
+                            Console.ForegroundColor = ConsoleColor.White; 
+                        }
+                        else 
+                        {
+                            Console.ForegroundColor = ConsoleColor.Gray; 
+                        }
+                        isWhite = !isWhite;
+
+                        //Yellow background if it's selected now
+                        Console.CursorLeft = 1;
+                        if(Console.CursorTop == curPos)
+                        {
+                            Console.BackgroundColor = ConsoleColor.Yellow;
+                        }
+
+                        //Write cur dir
+                        Console.Write(dir);
+                        for (int x = 0; x != totalLen - dir.Length; x++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.Write("<dir>   ");
+
+                        //Is folder empty?
+                        if (Directory.GetDirectories(FS.curPath + dir).Length < 1 && Directory.GetFiles(FS.curPath + dir).Length < 1)
+                        {
+                            Console.WriteLine("(empty)");
+                        }
+                        else
+                        {
+                            Console.Write("\n");
+                        }
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    }
+
+                    string[] files = Directory.GetFiles(FS.curPath);
+                    foreach (string file in files)
+                    {
+                        if (isWhite == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
+                        isWhite = !isWhite;
+
+
+                        //Yellow background if it's selected now
+                        Console.CursorLeft = 1;
+                        if (Console.CursorTop == curPos)
+                        {
+                            Console.BackgroundColor = ConsoleColor.Yellow;
+                        }
+
+                        //Write cur file with it's size
+                        Console.Write(file);
+                        int size = (int)new FileInfo(FS.curPath + file).Length;
+                        for (int x = 0; x != totalLen - file.Length; x++)
+                        {
+                            Console.Write(" ");
+                        }
+                        Console.Write(size.ToString() + "B\n");
+
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    }
+
+                    //current position of cursor
+                    int cPos = Console.CursorTop;
+
+                    //Writing upper button
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(1, 4);
+                    if(Console.CursorTop == curPos)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Yellow;
+
+
+                    }
+                    Console.Write("[^]");
+                    Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    Console.SetCursorPosition(1, cPos);
+
+                    //Selectables is things that can be selected by user - files and dirs
+                    List<string> selectable = new List<string>();
+
+                    //Adds "upper dir" button
+                    selectable.Add("[^]");
+                    //Add dirs and files to selectables
+                    selectable.AddRange(dirs); selectable.AddRange(files);
+
+                    //terminal in last line
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(0, 24);
+                    Console.Write(FS.curPath + ">");
+
+                    //terminal command
+                    List<char> commandSymb = new List<char>();
+
+                    for (; ; )
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+
+                        if (key.Key == ConsoleKey.Enter)
+                        {
+                            if(commandSymb.Count == 0)
+                            {
+                                //Position
+                                int id = curPos - 4;
+                                //Go to upper directory
+                                if(id == 0)
+                                {
+                                    FS.curPath = upDir();
+                                    curPos = 4;
+                                    break;
+                                }
+                                //Change directory
+                                if(id >= files.Length && dirs.Length != 0)
+                                {
+                                    string dirName = selectable[id];
+                                    string path = FS.curPath + dirName;
+                                    FS.curPath = path + @"\";
+                                    curPos = 4;
+                                }
+                            }
+
+                            Console.WriteLine();
+                            break;
+                        }
+                        else if(key.Key == ConsoleKey.Delete && curPos - 4 != 0)
+                        {
+                            int id = curPos - 4;
+
+                            if (id <= files.Length && files.Length != 0)
+                            {
+                                string fileName = selectable[id];
+                                api.delFile(FS.curPath, fileName);
+                                curPos--;
+                                break;
+                            }
+                            else
+                            {
+                                if (dirs.Length != 0)
+                                {
+                                    string dirName = selectable[id];
+                                    string path = FS.curPath + dirName;
+                                    if (Directory.GetDirectories(path).Length < 1 && Directory.GetFiles(path).Length < 1)
+                                    {
+                                        api.delDir(FS.curPath, dirName);
+                                    }
+                                    curPos--;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (key.Key == ConsoleKey.Escape)
+                        {
+                            //Close commander
+                            commanderOpened = false;
+                            api.cls(ConsoleColor.Black);
+                            break;
+                        }
+                        else if (key.Key == ConsoleKey.Backspace)
+                        {
+                            if (commandSymb.Count > 0)
+                            {
+
+                                Console.CursorLeft--;
+                                Console.Write(" ");
+                                Console.CursorLeft--;
+                                commandSymb.RemoveAt(commandSymb.Count - 1);
+                            }
+                        }
+                        else if(key.Key == ConsoleKey.DownArrow)
+                        {
+                            if (curPos < 3 + selectable.Count)
+                            {
+                                //select thing down
+                                curPos++;
+                                break;
+                            }
+                        }
+                        else if(key.Key == ConsoleKey.UpArrow)
+                        {
+                            if(curPos > 4)
+                            {
+                                //select thing upper
+                                curPos--;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            //Write single symbol
+                            Console.Write(key.KeyChar);
+                            commandSymb.Add(key.KeyChar);
+                        }
+                    }
+                    //if user typed command, execute it
+                    if (commandSymb.Count > 0)
+                    {
+                        terminal.execute(String.Concat(commandSymb).Split(' ', StringSplitOptions.TrimEntries));
+                    }
                 }
                 else
                 {
-                    terminal.execute(arg);
+                    break;
                 }
             }
         }
@@ -98,7 +305,7 @@ namespace MCLI
             }
         }
 
-        public static string readTxt(string path, string name)
+        public static string readFile(string path, string name)
         {
             string fullPath = path + name;
             if (File.Exists(fullPath))
@@ -210,7 +417,23 @@ namespace MCLI
             Console.Clear();
         }
 
-        public static void say(string text)
+        public static void cls(ConsoleColor col)
+        {
+            Console.Clear();
+            Console.BackgroundColor = col;
+            for (int x = 0; x != 80 * 25; x++)
+            {
+                Console.Write(" ");
+            }
+            Console.Clear();
+        }
+
+        public static void write(string text)
+        {
+            Console.Write(text);
+        }
+
+        public static void writeLine(string text)
         {
             Console.WriteLine(text);
         }
@@ -260,6 +483,25 @@ namespace MCLI
             }  
             Console.WriteLine(msg);
             Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static string upDir()
+        {
+            if (FS.curPath != @"0:\")
+            {
+                string[] pieces = FS.curPath.Split(@"\");
+                string newPath = "";
+                for (int x = 0; x != pieces.Length - 2; x++)
+                {
+                    newPath += pieces[x] + @"\";
+                }
+                return newPath;
+            }
+            else
+            {
+                api.notification(1, "Can't go upper than root folder!");
+                return @"0:\";
+            }
         }
     }
 }

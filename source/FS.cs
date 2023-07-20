@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Sys = Cosmos.System;
-using System.IO;
+﻿using Sys = Cosmos.System;
 using Cosmos.System.FileSystem;
 
 namespace MCLI
@@ -11,7 +6,7 @@ namespace MCLI
     public static class FS
     {
         //After-boot directory.
-        private static string stdPath = @"0:\User\";
+        private static string stdPath = @"0:\";
         //Current directory.
         public static string curPath;
 

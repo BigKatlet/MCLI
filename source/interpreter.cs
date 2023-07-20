@@ -7,10 +7,6 @@ namespace MCLI
     public static class interpreter
     {
 
-        //Variables. Coming soon.
-        /*static string _storageStrPath;
-        static string _storageIntPath;*/
-
         public static void executeProgramm(string path, string name){
             if (!name.EndsWith(".exe"))
             {
@@ -19,16 +15,6 @@ namespace MCLI
             else
             {
                 string fullPath = path + name;
-
-                //Yep, that's too variables. They're too coming soon.
-                /*_storageStrPath = fullPath.Remove(_storageStrPath.Length-4, 4);
-                _storageStrPath += "_str.tmp";
-                File.Create(_storageStrPath);
-
-                _storageIntPath = fullPath;
-                _storageIntPath = _storageIntPath[..^4];
-                _storageIntPath += "_int.tmp";
-                File.Create(_storageIntPath);*/
 
                 //Read all lines from file and execute all of them.
                 string[] lines = File.ReadAllLines(fullPath);
@@ -85,7 +71,7 @@ namespace MCLI
                     buff.Add(curLine);
                 }
                 File.WriteAllLines(fullPath, buff.ToArray());
-                api.cls();
+                api.cls(ConsoleColor.Black);
                 api.notification(0, "File '" + fullPath + "' hass been succesfully changed.");
             }
         }

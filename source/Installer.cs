@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCLI
 {
     public static class Installer
     {
+
+        //Build version
+        const int buildVer = 210;
+        //Stable version
+        const int stableVer = 2;
 
         public static void firstStartup()
         {
@@ -23,6 +24,7 @@ namespace MCLI
             Directory.CreateDirectory(@"0:\System");
             Directory.CreateDirectory(@"0:\System\Apps");
             Directory.CreateDirectory(@"0:\System\Logs");
+            Directory.CreateDirectory(@"0:\System\Params");
             ///
             File.Create(@"0:\System\Logs\doNotif");
 
@@ -37,58 +39,79 @@ namespace MCLI
             tryToDelFile(@"0:\Kudzu.txt");
             tryToDelFile(@"0:\Root.txt");
 
-            log.writeLine("COSMOS OS test files deleted or not found, creating 'User' directory");
+            log.writeLine("COSMOS OS test files deleted or not found, creating 'User' directory...");
 
             Directory.CreateDirectory(@"0:\User");
 
-            log.writeLine("'User' directory created, creating apps");
+            log.writeLine("'User' directory created, creating apps...");
 
             //Creates "Help.exe" file
             api.crtFile(@"0:\System\Apps\", "Help.exe");
             string[] helpToWrite = {
                                 "cls",
                                 "chngCol 8",
-                                "say Help list 1",
+                                "writeLine Help list 1",
                                 "chngCol 0",
-                                "say crtFile [name] - create file",
+                                "writeLine crtFile [name] - create file",
                                 "chngCol 1",
-                                "say delFile [name] - delete file",
+                                "writeLine delFile [name] - delete file",
                                 "chngCol 0",
-                                "say crtDir [name] - create dir",
+                                "writeLine crtDir [name] - create dir",
                                 "chngCol 1",
-                                "say delDir [name] - delete dir",
+                                "writeLine delDir [name] - delete dir",
                                 "chngCol 0",
-                                "say dir - displays containing of current directory",
+                                "writeLine dir - displays containing of current directory",
                                 "chngCol 1",
-                                "say cd [name] - change dir",
+                                "writeLine cd [name] - change dir",
                                 "chngCol 0",
-                                @"say root - go to 0:\ directory",
+                                @"writeLine root - go to 0:\ directory",
                                 "chngCol 1",
-                                "say up - go to upper directory",
+                                "writeLine up - go to upper directory",
                                 "chngCol 0",
-                                "say setStr [name] [textToBeSet] - set first string to file",
+                                "writeLine setStr [name] [textToBeSet] - set first string to file",
                                 "chngCol 1",
-                                "say readTxt [name] - reads and writes all strings of file",
+                                "writeLine readFile [name] - reads and writes all strings of file",
                                 "chngCol 0",
-                                "say chngCol [index] - change color of text",
+                                "writeLine chngCol [index ] - change color of text",
                                 "chngCol 1",
-                                "say editExe [name] - .exe editor. Don't write anything and press Enter to exit.",
+                                "writeLine editExe [name] - .exe editor. Empty string + enter to exit",
                                 "chngCol 0",
-                                "say exe [name] - execute .exe file",
+                                "writeLine exe [name] - execute .exe file",
                                 "chngCol 1",
-                                "say commander - commander. Don't write anything and press Enter to exit.",
+                                "writeLine commander - commander. Empty string + enter to exit.",
                                 "chngCol 0",
-                                "say say [text] - write text to console",
+                                "writeLine write [text] - write text to console",
                                 "chngCol 1",
-                                "say shutdown - turn off computer",
+                                "writeLine writeLine [text] - write line to console",
                                 "chngCol 0",
-                                "say info - information about system",
+                                "writeLine shutdown - turn off computer",
                                 "chngCol 1",
-                                "say waitForKey - wait for any key press",
+                                "writeLine info - information about system",
+                                "chngCol 0",
+                                "writeLine waitForKey - wait for any key to be pressed",
                                 "chngCol 7",
-                                "say Press any key to continue...",
+                                "writeLine Press any key to continue...",
                                 "waitForKey"};
             File.WriteAllLines(@"0:\System\Apps\Help.exe", helpToWrite);
+
+            api.crtFile(@"0:\System\Apps\", "info.exe");
+            string[] infoToWrite =
+            {
+                "chngCol 7",
+                "writeLine MCLI (Main Command Line Interface OS)",
+                "write Build #", "write $os_buildver",
+                "writeLine",
+                "write Stable version #", "write $os_stablever",
+                "writeLine",
+                "write --------------------------------------------------------------------------------",
+                "chngCol 0"
+            };
+            File.WriteAllLines(@"0:\System\Apps\info.exe", infoToWrite);
+
+            api.crtFile(@"0:\System\Params\", "stablever.opt");
+            File.WriteAllText(@"0:\System\Params\stablever.opt", stableVer.ToString());
+            api.crtFile(@"0:\System\Params\", "buildver.opt");
+            File.WriteAllText(@"0:\System\Params\buildver.opt", buildVer.ToString());
 
             log.writeLine("Apps created");
 

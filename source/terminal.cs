@@ -1,33 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Threading;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MCLI
 {
     public static class terminal
     {
-        //Build version
-        const int buildVer = 116;
-        //Stable version
-        const int stableVer = 1;
 
         public static void execute(string[] arg)
         {
+            arg[0] = arg[0].ToLower();
+
             switch (arg[0])
             {
                 case "info":
                     //Info about system
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("MCLI (Main Command Line Interface Operating System)");
-                    Console.WriteLine("Build #" + buildVer + "/15.06.2023");
-                    Console.WriteLine("Stable version #" + stableVer);
-                    Console.Write("--------------------------------------------------------------------------------");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    interpreter.executeProgramm(@"0:\System\Apps\", "info.exe");
                     //Easter egg
                     if (arg.Length > 1)
                     {
@@ -40,38 +27,38 @@ namespace MCLI
   150, 350, 250, 100, 100, 100, 450, 150, 350, 250, 100, 250, 250, 100, 750};
                             for (int i = 0; i < 42; i++)
                             {
-                                Cosmos.System.PCSpeaker.Beep(Convert.ToUInt32(notes[i]), Convert.ToUInt32(times[i]));
-                                Cosmos.HAL.Global.PIT.Wait(Convert.ToUInt32(times[i]));
+                                Cosmos.System.PCSpeaker.Beep((uint)notes[i], (uint)times[i]);
+                                Cosmos.HAL.Global.PIT.Wait((uint)times[i]);
                             }
                         }
                     }
                     break;
-                case "readFile":
+                case "readfile":
                     string[] text = File.ReadAllLines(FS.curPath + arg[1]);
                     foreach(string x in text)
                     {
                         Console.WriteLine(x);
                     }
                     break;
-                case "setStr":
+                case "setstr":
                     //DON'T TOUCH THIS SHIT. IT MAY NOT WORK.
                     string name = arg[1];
                     string textToWrite = uniteArgs(arg, 2, true);
                     api.setStr(FS.curPath, name, textToWrite);
                     break;
-                case "crtFile":
+                case "crtfile":
                     //Creates file
                     api.crtFile(FS.curPath, arg[1]);
                     break;
-                case "delFile":
+                case "delfile":
                     //Deletes file
                     api.delFile(FS.curPath, arg[1]);
                     break;
-                case "crtDir":
+                case "crtdir":
                     //Creates directory
                     api.crtDir(FS.curPath, arg[1]);
                     break;
-                case "delDir":
+                case "deldir":
                     //Deletes directory
                     api.delDir(FS.curPath, arg[1]);
                     break;
@@ -80,7 +67,7 @@ namespace MCLI
                     changeDir(arg[1]);
                     break;
                 case "cls":
-                    api.cls();
+                    api.cls(ConsoleColor.Black);
                     break;
                 case "dir":
                     dir();
@@ -89,13 +76,34 @@ namespace MCLI
                     //Executes .exe file
                     interpreter.executeProgramm(FS.curPath, arg[1]);
                     break;
-                case "editExe":
+                case "editexe":
                     //Opens .exe editor
                     interpreter.editFile(FS.curPath, arg[1]);
                     break;
-                case "say":
-                    //Writes text to console.
-                    api.say(uniteArgs(arg, 1, true));
+                case "write":
+                    //Like Console.Write().
+                    if (arg[1].StartsWith("$"))
+                    {
+                        switch (arg[1])
+                        {
+                            case "$os_stablever":
+                                api.write(File.ReadAllText(@"0:\System\Params\stablever.opt"));
+                                break;
+                            case "$os_buildver":
+                                api.write(File.ReadAllText(@"0:\System\Params\buildver.opt"));
+                                break;
+                            default:
+                                api.notification(2, "Variable '" + arg[1] + "' doesn't exist!");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        api.write(uniteArgs(arg, 1, true));
+                    }
+                    break;
+                case "writeline":
+                    api.writeLine(uniteArgs(arg, 1, true));
                     break;
                 case "shutdown":
                     //SUDDENLY, shuts off system.
@@ -107,9 +115,9 @@ namespace MCLI
                     break;
                 case "up":
                     //Go upper
-                    FS.curPath = up();
+                    FS.curPath = api.upDir();
                     break;
-                case "chngCol":
+                case "chngcol":
                     //SUDDENLY, changes color of output. 
                     // 0 - white; 1 - gray; 2 - yellow; 3 - red; 4 - dark blue;
                     // 5 - blue; 6 - dark green; 7 - green; 8 - pink; 9 - cyan.
@@ -123,7 +131,7 @@ namespace MCLI
                     //Execute through interpreter "0:\System\Apps\Help.exe".
                     interpreter.executeProgramm(@"0:\System\Apps\", "Help.exe");
                     break;
-                case "waitForKey":
+                case "waitforkey":
                     //Wait for key press and erase symbol.
                     Console.ReadKey();
                     Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
@@ -136,39 +144,25 @@ namespace MCLI
             }
         }
 
-        static string up()
-        {
-            if (FS.curPath != @"0:\")
-            {
-                //Holy fucking magic with strings
-                string[] pieces = FS.curPath.Split(@"\");
-                string newPath = "";
-                for (int x = 0; x != pieces.Length - 2; x++)
-                {
-                    newPath += pieces[x] + @"\";
-                }
-                return newPath;
-            }
-            else
-            {
-                api.notification(1, "Can't go upper than root folder!");
-                return @"0:\";
-            }
-        }
-
         static void dir()
         {
             //Displays content of directory
-            string[] dirs = Directory.GetDirectories(FS.curPath);
             int totalLen = 25;
-            int count = 0;
+            bool isWhite = true;
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("--------------------------------------------------------------------------------");
-            foreach (string dir in dirs)
+            foreach (string dir in Directory.GetDirectories(FS.curPath))
             {
-                if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
-                else { Console.ForegroundColor = ConsoleColor.Gray; }
-                count++; if (count > 1) { count = 0; }
+                if (isWhite == true)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+                isWhite = !isWhite;
 
                 Console.Write(dir);
                 for (int x = 0; x != totalLen - dir.Length; x++)
@@ -177,10 +171,7 @@ namespace MCLI
                 }
                 Console.Write("<dir>");
 
-                string[] dirsInDir = Directory.GetDirectories(FS.curPath + dir);
-                string[] filesInDir = Directory.GetFiles(FS.curPath + dir);
-
-                if (dirsInDir.Length < 1 && filesInDir.Length < 1)
+                if (Directory.GetDirectories(FS.curPath + dir).Length < 1 && Directory.GetFiles(FS.curPath + dir).Length < 1)
                 {
                     Console.WriteLine("   (empty)");
                 }
@@ -189,12 +180,17 @@ namespace MCLI
                     Console.Write("\n");
                 }
             }
-            string[] files = Directory.GetFiles(FS.curPath);
-            foreach (string file in files)
+            foreach (string file in Directory.GetFiles(FS.curPath))
             {
-                if (count == 0) { Console.ForegroundColor = ConsoleColor.White; }
-                else { Console.ForegroundColor = ConsoleColor.Gray; }
-                count++; if (count > 1) { count = 0; }
+                if (isWhite == true)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+                isWhite = !isWhite;
 
                 Console.Write(file);
                 int size = (int)new FileInfo(FS.curPath + file).Length;
@@ -202,8 +198,7 @@ namespace MCLI
                 {
                     Console.Write(" ");
                 }
-                Console.Write(size.ToString());
-                Console.WriteLine("B");
+                Console.Write(size.ToString() + "B\n");
             }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("--------------------------------------------------------------------------------");
