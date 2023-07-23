@@ -21,6 +21,7 @@
         <DebugEnabled>False</DebugEnabled>
         <OptimizationLevel>1</OptimizationLevel>
         <VMWareEdition>Workstation</VMWareEdition>
+        <SignAssembly>False</SignAssembly>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cosmos.Core.Memory;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -289,6 +290,8 @@ namespace MCLI
                 {
                     break;
                 }
+                
+                Heap.Collect();
             }
         }
 
